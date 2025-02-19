@@ -1,75 +1,61 @@
-Face Recognition Using OpenCV and face_recognition
+# Real-time Face Recognition with OpenCV and face_recognition
 
-Overview
+This Python script performs real-time face recognition using your webcam.  It utilizes the `face_recognition` library for face detection and recognition, and OpenCV (cv2) for video capture and image processing.
 
-This project implements real-time face recognition using the face_recognition and cv2 libraries. The program detects faces from a live webcam feed and identifies them based on a set of predefined images.
+## Prerequisites
 
-Features
+Before running the script, ensure you have the following libraries installed:
 
-Loads and encodes known faces from image files.
+*   **OpenCV (cv2):** Install using: `pip install opencv-python`
+*   **face_recognition:** Install using: `pip install face_recognition`
+*   **NumPy:** Install using: `pip install numpy` (likely already installed with OpenCV or `face_recognition`)
 
-Captures video using the webcam.
+## How to Run
 
-Detects faces in real-time.
+1.  **Prepare your images:** Place the images of the people you want to recognize in a folder (e.g., "known_faces").  The script, as written, assumes the image files are directly in the same directory as the script.  You'll need to adjust the paths if they are in a subfolder.  Name the images with descriptive filenames (e.g., "Soha.jpg", "Harsha.jpg").
+2.  **Clone or download the repository (or save the script):** If you have the code in a repository, clone it. Otherwise, save the Python code as a `.py` file (e.g., `face_recognition_realtime.py`).
+3.  **Run the script:** Open a terminal or command prompt, navigate to the directory where you saved the file, and execute it using: `python face_recognition_realtime.py`
 
-Compares detected faces with known encodings and identifies them.
+## Usage
 
-Displays recognized names on the video feed.
+1.  **Capture video from your webcam:** The script will open a window displaying the feed from your default webcam.
+2.  **Recognize faces:** The script will detect faces in each frame and compare them to the known faces you've provided.
+3.  **Display names:** If a match is found, the name of the recognized person will be displayed below their face. If no match is found, "Unknown" will be displayed.
+4.  **Exit:** Press the 'q' key on your keyboard to close the window and stop the script.
 
-Exits the program when 'q' is pressed.
+## Code Explanation
 
-Requirements
+*   **Loading known faces:** The script loads images of known people, calculates their face encodings (a numerical representation of the face), and stores them along with their names.  **Important:** The current implementation assumes all the images are in the same directory as the script.  It's much better to use a loop to load images from a specified directory.  See the "Further Development" section for an example.
+*   **Capturing video:** `cv2.VideoCapture(0)` opens the default webcam.
+*   **Resizing and color conversion:** The frame is resized to improve performance (`fx=0.25`, `fy=0.25`) and converted from BGR (OpenCV's default) to RGB, which `face_recognition` requires.
+*   **Face detection and encoding:** `face_recognition.face_locations` finds the locations of faces in the frame. `face_recognition.face_encodings` calculates the face encodings for the detected faces.
+*   **Face comparison:** `face_recognition.compare_faces` compares the encodings of the detected faces with the encodings of the known faces.
+*   **Drawing bounding boxes and labels:** The script draws rectangles around the detected faces and displays the corresponding names.
+*   `process_this_frame`: This variable is used to process every other frame, further improving performance.
 
-Python 3.x
+## Troubleshooting
 
-OpenCV (cv2)
+*   **Webcam issues:** Ensure your webcam is working and properly connected.
+*   **Missing libraries:** Double-check that all required libraries are installed.
+*   **Recognition accuracy:** The accuracy of face recognition depends on the quality of the images used for training and the lighting conditions.  Better quality training images lead to better recognition.
+*   **Performance:** Face recognition can be computationally intensive.  Resizing the frame helps, but you might still experience slow performance depending on your hardware.
 
-face_recognition library
+## Further Development
 
-NumPy (numpy)
+*   **Loading images from a directory:**  Instead of listing each image individually, you can use the `os` module to load all images from a specific directory.  This is much more efficient and scalable.  Here's an example:
 
-Installation
+```python
+import os
 
-Install dependencies:
+known_face_encodings = []
+known_face_names = []
 
-pip install opencv-python numpy face-recognition
+known_faces_dir = "/Users/sohashaikh/Desktop/object detection open cv/known_faces"  # Replace with your directory
 
-Ensure you have a webcam connected and working.
-
-Usage
-
-Place images of known persons in the specified directory (/Users/sohashaikh/Desktop/object detection open cv/).
-
-Update the script with the correct file paths.
-
-Run the script:
-
-python face_recognition.py
-
-The webcam feed will open, detecting and labeling known faces.
-
-Press 'q' to exit the program.
-
-How It Works
-
-The script loads images of known individuals and encodes their facial features.
-
-It continuously captures video frames and processes every alternate frame to improve performance.
-
-It detects faces and compares them against known encodings.
-
-If a match is found, the corresponding name is displayed.
-
-Known Issues
-
-The accuracy of recognition depends on lighting and image quality.
-
-Processing many faces may slow down performance.
-
-Future Improvements
-
-Optimize for faster processing.
-
-Implement database storage for face encodings.
-
-Add support for multiple cameras.
+for filename in os.listdir(known_faces_dir):
+    if filename.endswith((".jpg", ".png", ".jpeg")): # Check for common image types
+        image_path = os.path.join(known_faces_dir, filename)
+        image = face_recognition.load_image_file(image_path)
+        encoding = face_recognition.face_encodings(image)[0]  # Get the first encoding (if multiple faces, consider all)
+        known_face_encodings.append(encoding)
+        known_face_names.append(os.path.splitext(filename)[0]) # Use filename without extension as the name
