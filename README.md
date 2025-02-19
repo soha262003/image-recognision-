@@ -40,22 +40,3 @@ Before running the script, ensure you have the following libraries installed:
 *   **Recognition accuracy:** The accuracy of face recognition depends on the quality of the images used for training and the lighting conditions.  Better quality training images lead to better recognition.
 *   **Performance:** Face recognition can be computationally intensive.  Resizing the frame helps, but you might still experience slow performance depending on your hardware.
 
-## Further Development
-
-*   **Loading images from a directory:**  Instead of listing each image individually, you can use the `os` module to load all images from a specific directory.  This is much more efficient and scalable.  Here's an example:
-
-```python
-import os
-
-known_face_encodings = []
-known_face_names = []
-
-known_faces_dir = "/Users/sohashaikh/Desktop/object detection open cv/known_faces"  # Replace with your directory
-
-for filename in os.listdir(known_faces_dir):
-    if filename.endswith((".jpg", ".png", ".jpeg")): # Check for common image types
-        image_path = os.path.join(known_faces_dir, filename)
-        image = face_recognition.load_image_file(image_path)
-        encoding = face_recognition.face_encodings(image)[0]  # Get the first encoding (if multiple faces, consider all)
-        known_face_encodings.append(encoding)
-        known_face_names.append(os.path.splitext(filename)[0]) # Use filename without extension as the name
